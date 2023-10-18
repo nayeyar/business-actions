@@ -1,8 +1,8 @@
-name: Test & Deployment
+name: Build & Deployment
 
-# When to trigger the workflow. This runs on pull requests to the main branch
+# When to trigger the workflow. This runs on push to the main branch
 on:
-  pull_request:
+  push:
     branches: [main]
 
 # List of jobs to run with the steps to take.
