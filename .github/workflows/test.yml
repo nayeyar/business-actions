@@ -1,17 +1,22 @@
 name: Test
+
+# When to trigger the workflow. This runs on pull requests to the main branch
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
+# List of jobs to run with the steps to take.
 jobs:
-  test:
-    name: Test
+  test: # Job Id
+    name: Test # Job Name
     runs-on: ubuntu-latest
-
+    # Install packages and run tests
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 16.x
-    - run: npm ci
-    - run: npm test
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Use Node-Version
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - run: npm test

@@ -1,21 +1,43 @@
-name: Deployment
-env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+name: Build & Deployment
+
+# When to trigger the workflow. This runs on push to the main branch
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+
+# List of jobs to run with the steps to take.
 jobs:
-  Deploy-Production:
+  test: # Job Id
+    name: Test # Job Name
+    runs-on: ubuntu-latest
+    # Install packages and run tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Use Node-Version
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - run: npm ci
+      - run: npm test
+
+  build:
+    name: Build & Deploy
+    needs: test # Build only if tests are passed
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-      - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Build Project Artifacts
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+      # Setup Node.js
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Use Node-Version
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      # Install Railway
+      - name: Install Railway
+        run: npm i -g @railway/cli
+      # Build and run using Dockerfile
+      - name: Deploy
+        run: railway up
+        env:
+          RAILWAY_TOKEN: ${{secrets.RAILWAY_TOKEN}}
